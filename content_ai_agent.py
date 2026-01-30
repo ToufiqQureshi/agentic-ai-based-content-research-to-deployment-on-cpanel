@@ -1,9 +1,9 @@
-from agno.agent import Agent
-from agno.tools.searxng import SearxngTools
-from agno.models.ollama import Ollama
-from agno.db.sqlite import SqliteDb
-from agno.tools import tool
-from agno.tools.duckduckgo import DuckDuckGoTools
+from phi.agent import Agent
+from phi.tools.searxng import Searxng
+from phi.model.ollama import Ollama
+from phi.storage.agent.sqlite import SqlAgentStorage
+from phi.tools import tool
+from phi.tools.duckduckgo import DuckDuckGo
 import requests
 import base64
 import re
@@ -16,15 +16,16 @@ import os
 
 console = Console()
 
-
 load_dotenv()
-
 
 # ============ IMAGE UPLOAD TOOL ============
 @tool()
 def upload_image_to_imgbb(image_path: str) -> str:
     """Upload an image to ImgBB and return the URL."""
-    API_KEY = os.getenv("imagebb_api_key")
+    API_KEY = os.getenv("IMGBB_API_KEY") or os.getenv("imagebb_api_key")
+
+    if not API_KEY:
+        return "❌ Error: IMGBB_API_KEY not found in environment variables."
 
     try:
         with open(image_path, "rb") as file:
@@ -45,10 +46,17 @@ def upload_image_to_imgbb(image_path: str) -> str:
 def deploy_to_cpanel(html_content: str, blog_title: str, session_state: dict) -> str:
     """Deploy HTML content to cPanel via HTTP API and return permalink"""
     try:
+        host = os.getenv("CPANEL_HOST")
+        username = os.getenv("CPANEL_USERNAME")
+        api_token = os.getenv("CPANEL_API_KEY") or os.getenv("Cpanel_api_key")
+
+        if not host or not username or not api_token:
+             return "❌ Error: CPanel credentials (CPANEL_HOST, CPANEL_USERNAME, CPANEL_API_KEY) not found in environment variables."
+
         cpanel_config = {
-            "host": "https://neurofiq.in:2083",
-            "username": "jsliprpn",
-            "api_token": os.getenv("Cpanel_api_key"),
+            "host": host,
+            "username": username,
+            "api_token": api_token,
         }
 
         # Generate SEO-friendly filename from blog title
@@ -69,15 +77,27 @@ def deploy_to_cpanel(html_content: str, blog_title: str, session_state: dict) ->
 
         seo_slug = create_seo_slug(blog_title)
         filename = f"{seo_slug}"
-        filepath = f"/home/jsliprpn/public_html/{filename}"
-        permalink = f"https://neurofiq.in/{filename}"
+        # Ideally public_html path should also be configurable or derived
+        # For now, we assume public_html is in the user's home directory
+
+        # Domain extraction for permalink (assuming host is something like https://domain.com:2083)
+        # We need the public domain.
+        domain = os.getenv("CPANEL_DOMAIN")
+        if not domain:
+            # Fallback: try to guess from host or hardcode if user didn't provide.
+            # The original code had "https://neurofiq.in".
+            domain = "https://yourdomain.com"
+            if "neurofiq.in" in host:
+                 domain = "https://neurofiq.in"
+
+        permalink = f"{domain}/{filename}"
 
         headers = {
             "Authorization": f"cpanel {cpanel_config['username']}:{cpanel_config['api_token']}"
         }
         upload_url = f"{cpanel_config['host']}/execute/Fileman/save_file_content"
         params = {
-            "dir": "/home/jsliprpn/public_html",
+            "dir": f"/home/{username}/public_html",
             "file": filename,
             "content": html_content,
             "from_charset": "_DETECT_",
@@ -99,20 +119,21 @@ def deploy_to_cpanel(html_content: str, blog_title: str, session_state: dict) ->
 
 
 # Database setup
-db = SqliteDb(db_file="neurofiq_content.db")
+# SqliteDb in older versions, SqlAgentStorage in new
+db = SqlAgentStorage(table_name="agent_sessions", db_file="neurofiq_content.db")
 
 # ============ COMBINED ALL-IN-ONE AGENT ============
 unified_content_agent = Agent(
     name="Unified Content Creation Agent",
     model=Ollama(id="deepseek-v3.1:671b-cloud"),
-    db=db,
+    storage=db,
     session_state={"featured_image_url": None, "permalink": None, "filename": None},
     add_session_state_to_context=True,
     tools=[
         upload_image_to_imgbb,
         deploy_to_cpanel,
-        SearxngTools(host="http://localhost:8080", fixed_max_results=30),
-        DuckDuckGoTools(),
+        Searxng(host="http://localhost:8080", fixed_max_results=30),
+        DuckDuckGo(),
     ],
     instructions="""
     You are an ELITE ALL-IN-ONE CONTENT CREATION SPECIALIST combining:
@@ -442,7 +463,5 @@ if __name__ == "__main__":
     console.print("Tell me your topic and I'll handle everything!\n")
 
     unified_content_agent.cli_app(
-        input="What content do you want to create?",
         stream=True,
-        markdown=True,
     )

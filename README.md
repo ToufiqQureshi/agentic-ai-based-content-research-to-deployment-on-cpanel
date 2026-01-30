@@ -1,7 +1,7 @@
 # 🚀 **Neurofiq Unified Content Creation Agent**
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg?logo=python)
-![Framework](https://img.shields.io/badge/Framework-Agno-lightgreen?logo=fastapi)
+![Python](https://img.shields.io/badge/Python-3.12+-blue.svg?logo=python)
+![Framework](https://img.shields.io/badge/Framework-Phidata-lightgreen?logo=fastapi)
 ![LLM](https://img.shields.io/badge/LLM-Ollama%20%7C%20DeepSeek--V3.1-orange?logo=openai)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Build](https://img.shields.io/badge/Status-Active-success.svg)
@@ -13,7 +13,7 @@
 ## 🧭 **Overview**
 
 **Neurofiq Unified Agent** is a **Python-powered AI automation system** that transforms any blog topic into a **live SEO-optimized article**.
-It integrates **Agno**, **Ollama**, and multiple **custom tools** to manage every step — from research to publication — in an intelligent, conversational flow.
+It integrates **Phidata**, **Ollama**, and multiple **custom tools** to manage every step — from research to publication — in an intelligent, conversational flow.
 
 ---
 
@@ -63,10 +63,10 @@ It integrates **Agno**, **Ollama**, and multiple **custom tools** to manage ever
 
 | Component                   | Description                                   |
 | --------------------------- | --------------------------------------------- |
-| `agno.agent.Agent`          | Core framework class for building agent.      |
-| `agno.models.ollama.Ollama` | LLM integration (`deepseek-v3.1:671b-cloud`). |
-| `agno.db.sqlite.SqliteDb`   | Stores session data in `neurofiq_content.db`. |
-| `agno.tools`                | Provides `@tool` decorator for utilities.     |
+| `phi.agent.Agent`           | Core framework class for building agent.      |
+| `phi.model.ollama.Ollama`   | LLM integration (`deepseek-v3.1:671b-cloud`). |
+| `phi.storage.agent.sqlite`  | Stores session data in `neurofiq_content.db`. |
+| `phi.tools`                 | Provides `@tool` decorator for utilities.     |
 | `rich`                      | Adds colorized CLI interface.                 |
 | `python-dotenv`             | Handles environment secrets.                  |
 
@@ -107,11 +107,17 @@ cd agentic-ai-based-content-research-to-deployment-on-cpanel
 pip install -r requirements.txt
 ```
 
-Then, set your environment variables in `.env` file:
+Then, set your environment variables in `.env` file (see `.env.example`):
 
 ```bash
-imagebb_api_key="YOUR_IMGBB_API_KEY"
-cpanel_api_key="YOUR_CPANEL_API_TOKEN"
+# CPanel Configuration
+CPANEL_HOST="https://yourdomain.com:2083"
+CPANEL_USERNAME="your_username"
+CPANEL_API_KEY="your_api_token"
+CPANEL_DOMAIN="https://yourdomain.com"
+
+# ImgBB Configuration
+IMGBB_API_KEY="your_imgbb_api_key"
 ```
 
 ---
@@ -121,7 +127,7 @@ cpanel_api_key="YOUR_CPANEL_API_TOKEN"
 Run the agent:
 
 ```bash
-python your_script_name.py
+python content_ai_agent.py
 ```
 
 Follow the CLI prompts to:
@@ -132,7 +138,8 @@ Follow the CLI prompts to:
 
 ## 📦 **Dependencies**
 
-* `agno`
+* `phidata`
+* `ollama`
 * `requests`
 * `python-dotenv`
 * `rich`

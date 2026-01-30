@@ -1,0 +1,8 @@
+phidata
+requests
+python-dotenv
+rich
+duckduckgo-search
+sqlalchemy
+packaging
+ollama
