@@ -1,9 +1,9 @@
-from phi.agent import Agent
-from phi.tools.searxng import Searxng
-from phi.model.ollama import Ollama
-from phi.storage.agent.sqlite import SqlAgentStorage
-from phi.tools import tool
-from phi.tools.duckduckgo import DuckDuckGo
+from agno.agent import Agent
+from agno.tools.searxng import SearxngTools
+from agno.models.ollama import Ollama
+from agno.db.sqlite import SqliteDb
+from agno.tools import tool
+from agno.tools.duckduckgo import DuckDuckGoTools
 import requests
 import base64
 import re
@@ -119,21 +119,20 @@ def deploy_to_cpanel(html_content: str, blog_title: str, session_state: dict) ->
 
 
 # Database setup
-# SqliteDb in older versions, SqlAgentStorage in new
-db = SqlAgentStorage(table_name="agent_sessions", db_file="neurofiq_content.db")
+db = SqliteDb(db_file="neurofiq_content.db")
 
 # ============ COMBINED ALL-IN-ONE AGENT ============
 unified_content_agent = Agent(
     name="Unified Content Creation Agent",
     model=Ollama(id="deepseek-v3.1:671b-cloud"),
-    storage=db,
+    db=db,
     session_state={"featured_image_url": None, "permalink": None, "filename": None},
     add_session_state_to_context=True,
     tools=[
         upload_image_to_imgbb,
         deploy_to_cpanel,
-        Searxng(host="http://localhost:8080", fixed_max_results=30),
-        DuckDuckGo(),
+        SearxngTools(host="http://localhost:8080", fixed_max_results=30),
+        DuckDuckGoTools(),
     ],
     instructions="""
     You are an ELITE ALL-IN-ONE CONTENT CREATION SPECIALIST combining:

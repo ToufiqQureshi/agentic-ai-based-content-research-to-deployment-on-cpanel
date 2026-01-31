@@ -1,7 +1,7 @@
 # 🚀 **Neurofiq Unified Content Creation Agent**
 
 ![Python](https://img.shields.io/badge/Python-3.12+-blue.svg?logo=python)
-![Framework](https://img.shields.io/badge/Framework-Phidata-lightgreen?logo=fastapi)
+![Framework](https://img.shields.io/badge/Framework-Agno-lightgreen?logo=fastapi)
 ![LLM](https://img.shields.io/badge/LLM-Ollama%20%7C%20DeepSeek--V3.1-orange?logo=openai)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Build](https://img.shields.io/badge/Status-Active-success.svg)
@@ -13,7 +13,7 @@
 ## 🧭 **Overview**
 
 **Neurofiq Unified Agent** is a **Python-powered AI automation system** that transforms any blog topic into a **live SEO-optimized article**.
-It integrates **Phidata**, **Ollama**, and multiple **custom tools** to manage every step — from research to publication — in an intelligent, conversational flow.
+It integrates **Agno**, **Ollama**, and multiple **custom tools** to manage every step — from research to publication — in an intelligent, conversational flow.
 
 ---
 
@@ -23,6 +23,7 @@ It integrates **Phidata**, **Ollama**, and multiple **custom tools** to manage e
 * 🔍 **Elite SEO Research** — Fetches top keywords, competitors & trends via *Searxng* and *DuckDuckGo*.
 * ✍️ **Humanized Writing** — 3000+ words, SEO-rich, fact-checked & AI-detection safe.
 * 🌐 **Dynamic HTML** — Converts Markdown → TailwindCSS-styled HTML template.
+* 🤖 **AI Analytics Tracker** — **NEW!** Automatically injects tracking script to detect ChatGPT/Gemini visitors.
 * ☁️ **Auto Deploy** — Publishes directly to your cPanel & returns a permalink.
 * 🖼️ **Image Hosting** — Uploads featured images using ImgBB API.
 * 💾 **Persistent Memory** — Saves states (URLs, API keys, etc.) in SQLite DB.
@@ -54,8 +55,9 @@ It integrates **Phidata**, **Ollama**, and multiple **custom tools** to manage e
 ### 🌐 **Phase 4 — HTML & Deployment**
 
 1. Convert to styled Tailwind HTML.
-2. Deploy via `deploy_to_cpanel`.
-3. Return public **permalink**.
+2. Inject **AI Referral Tracker** script.
+3. Deploy via `deploy_to_cpanel`.
+4. Return public **permalink**.
 
 ---
 
@@ -63,10 +65,10 @@ It integrates **Phidata**, **Ollama**, and multiple **custom tools** to manage e
 
 | Component                   | Description                                   |
 | --------------------------- | --------------------------------------------- |
-| `phi.agent.Agent`           | Core framework class for building agent.      |
-| `phi.model.ollama.Ollama`   | LLM integration (`deepseek-v3.1:671b-cloud`). |
-| `phi.storage.agent.sqlite`  | Stores session data in `neurofiq_content.db`. |
-| `phi.tools`                 | Provides `@tool` decorator for utilities.     |
+| `agno.agent.Agent`          | Core framework class for building agent.      |
+| `agno.models.ollama.Ollama` | LLM integration (`deepseek-v3.1:671b-cloud`). |
+| `agno.db.sqlite.SqliteDb`   | Stores session data in `neurofiq_content.db`. |
+| `agno.tools`                | Provides `@tool` decorator for utilities.     |
 | `rich`                      | Adds colorized CLI interface.                 |
 | `python-dotenv`             | Handles environment secrets.                  |
 
@@ -134,11 +136,14 @@ Follow the CLI prompts to:
 
 > Provide a topic → upload image → generate content → deploy → get permalink 🌍
 
+### 📊 **Checking AI Analytics**
+Check `AI_ANALYTICS_PLAN.md` for details on how to use the logs and JS tracker.
+
 ---
 
 ## 📦 **Dependencies**
 
-* `phidata`
+* `agno`
 * `ollama`
 * `requests`
 * `python-dotenv`
