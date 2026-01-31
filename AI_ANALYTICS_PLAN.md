@@ -73,14 +73,20 @@ Niche ek ready-to-use script hai. Ise aap apni website par laga sakte hain:
         gtag('event', 'ai_referral', {
           'event_category': 'AI Traffic',
           'event_label': matchingAI,
+          'page_location': window.location.href, // Tracks WHICH URL (e.g. resort-lonavala.html)
           'transport_type': 'beacon'
         });
       }
 
-      // OPTIONAL: Apne server par bhejo
-      // fetch('https://your-api.com/track-ai', {
+      // OPTIONAL: Send to Custom Dashboard Backend
+      // fetch('https://your-api.com/track-ai-referral', {
       //   method: 'POST',
-      //   body: JSON.stringify({ source: matchingAI, url: window.location.href })
+      //   headers: {'Content-Type': 'application/json'},
+      //   body: JSON.stringify({
+      //     source: matchingAI,
+      //     url: window.location.href,
+      //     timestamp: new Date().toISOString()
+      //   })
       // });
     }
   })();
@@ -89,9 +95,36 @@ Niche ek ready-to-use script hai. Ise aap apni website par laga sakte hain:
 
 ---
 
-## 🚀 Summary for You
-1.  **Passive JS Script (Option 3)** sabse practical solution hai abhi ke liye. Isse aapko pata chalega ki *kaunsa AI traffic bhej raha hai*.
-2.  **Active Tracking (Option 2)** tab useful hai jab aapko *ranking position* janni ho (bina traffic ke).
-3.  Maine code poora fix kar diya hai (`phidata` use karke). Aap ab agent run kar sakte hain!
+## 📈 Dashboard Concept (Backend)
 
-Agar aapko ye JS Script backend ke saath chahiye (jahan aapka dashboard ho), toh hamein ek chhota Flask/FastAPI server banana padega. Batayiyega agar wo build karna ho!
+Agar aapko ek **Dashboard** chahiye jahan dikhe ki:
+> "Gemini ne 'Best Resort in Lonavala' query ke liye aapki site `my-resort.com/lonavala` ko cite kiya."
+
+Toh aapko ek **Backend Server** chahiye hoga jo wo JS Script se data receive kare.
+
+### Example Backend Logic (Python/Flask):
+
+```python
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/track-ai-referral', methods=['POST'])
+def track_referral():
+    data = request.json
+    source = data.get('source') # e.g., gemini.google.com
+    url = data.get('url')       # e.g., https://yoursite.com/resorts-lonavala
+
+    # Save to Database (SQLite/PostgreSQL)
+    save_to_db(source, url)
+
+    return jsonify({"status": "tracked"}), 200
+
+# Dashboard Route
+@app.route('/dashboard')
+def show_dashboard():
+    # Fetch data from DB and show table
+    return render_template('dashboard.html', stats=get_stats_from_db())
+```
+
+Is setup se aapko pata chalega ki **kaunsa AI** aapke **kis page** par traffic bhej raha hai!

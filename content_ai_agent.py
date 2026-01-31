@@ -312,6 +312,26 @@ unified_content_agent = Agent(
     <link rel="icon" href="https://ik.imagekit.io/s50r6mlmu/9a35ac5f-4794-44da-a55a-ed11fa3e4a88.png?updatedAt=1755519060665" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Neurofiq AI Referral Tracker -->
+    <script>
+    (function() {
+      const aiReferrers = ['chatgpt.com', 'openai.com', 'gemini.google.com', 'bard.google.com', 'claude.ai', 'anthropic.com', 'perplexity.ai', 'copilot.microsoft.com', 'bing.com'];
+      const referrer = document.referrer || "";
+      const matchingAI = aiReferrers.find(domain => referrer.includes(domain));
+      if (matchingAI) {
+        console.log(`🤖 AI Visitor Detected from: ${matchingAI}`);
+        if (typeof gtag === 'function') {
+          gtag('event', 'ai_referral', { 'event_category': 'AI Traffic', 'event_label': matchingAI, 'page_location': window.location.href });
+        }
+        // Send to custom backend (Optional - requires backend setup)
+        // fetch('https://your-api.com/track-ai-referral', {
+        //   method: 'POST',
+        //   headers: {'Content-Type': 'application/json'},
+        //   body: JSON.stringify({ source: matchingAI, url: window.location.href, timestamp: new Date().toISOString() })
+        // }).catch(err => console.error('Tracking failed', err));
+      }
+    })();
+    </script>
     <script>
     tailwind.config = {
         theme: {
