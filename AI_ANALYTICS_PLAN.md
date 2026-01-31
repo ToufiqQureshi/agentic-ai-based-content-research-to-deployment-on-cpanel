@@ -1,73 +1,54 @@
 # 🤖 AI Analytics & Citation Tracking (Plan in Hinglish)
 
-Hello! Maine poore code ko analyze kiya, bugs fix kiye, aur `agno` (jo exist nahi karta tha) ko `phidata` se replace kar diya hai. Ab code perfectly run karega.
+Hello! Maine poore code ko analyze kiya, bugs fix kiye, aur **Agno Framework** (jo finally mil gaya!) ko sahi se configure kar diya hai.
 
-Aapka jo feature request tha ki **"Kaise pata karein ki ChatGPT/Gemini humari site ko rank kar rahe hain ya nahi"** (Just like Google Analytics for AI), uske liye maine complete research aur plan banaya hai.
+Aapka jo feature request tha ki **"Kaise pata karein ki ChatGPT/Gemini humari site ko rank kar rahe hain ya nahi"** (Just like Google Analytics for AI), uske liye maine **Advanced Solution** dhoondha hai.
 
-Is concept ko aajkal **GEO (Generative Engine Optimization)** ya **AIO (AI Optimization)** kehte hain.
-
----
-
-## 📊 Feature: "AI Rank Tracker" kaise banayein?
-
-Currently, koi official "Google Analytics for AI" exist nahi karta jo saare AI models ka data ek jagah de. Lekin hum khud ka ek **Tracker Tool** bana sakte hain jo agent me add ho sakta hai.
-
-Yahan 2 tareeke hain isey implement karne ke:
-
-### 1. Passive Tracking (Traffic Source) - Easy
-Ye wo tareeka hai jisse hum check karte hain ki log AI se click karke humari site par aa rahe hain ya nahi.
-*   **Google Analytics 4 (GA4)** me `Referral Traffic` check karo.
-*   Agar traffic `chatgpt.com`, `gemini.google.com`, ya `bing.com` se aa raha hai, iska matlab AI aapko cite kar raha hai aur users link pe click kar rahe hain.
-*   **Feature Idea:** Hum agent me ek tool add kar sakte hain jo GA4 API se connect hoke ye report fetch kare.
-
-### 2. Active Tracking (Reverse Prompting) - Advanced & Powerful 🔥
-Ye wo feature hai jo aap chahte hain. Hum AI se hi poochte hain ki wo humare baare me kya jaanta hai.
-
-**Kaise kaam karega?**
-Hum ek naya tool banayenge `check_ai_ranking` jo ye karega:
-
-1.  **Queries generate karega:** Aapke blog topic se related sawal banayega.
-    *   *Example:* "Top 5 blogs about [Your Topic]", "Best resources for [Keyword]".
-2.  **Different AIs ko puchega:** Perplexity API, OpenAI API, aur Gemini API use karke ye sawal puchega.
-3.  **Mention Check karega:** Jo jawab aayega, usme aapki website ka URL ya Brand Name dhoondega.
-4.  **Report dega:** "Yes, Perplexity recommended your site at position #2!"
+Sirf JS script se sab kuch track nahi hota (kyunki AI bots JS run nahi karte). Isliye **Server Log Analysis** sabse best method hai.
 
 ---
 
-## 🛠️ Implementation Plan (Code Example)
+## 📊 Feature: "AI Rank Tracker" (Complete Solution)
 
-Agar aap ye feature add karna chahte hain, toh hum agent me ek naya tool add kar sakte hain. Niche ek example logic hai:
+Humne 2 methods implement kiye hain:
 
+### 1. Client-Side Tracking (JS Script) - Traffic ke liye
+Ye method tab kaam karta hai jab koi user AI ke link par click karke aapki site par aata hai.
+*   **Implementation:** Maine `content_ai_agent.py` ko update kar diya hai. Ab wo jo bhi blog generate karega, usme automatic ek **JS Script** hogi.
+*   **Kaam kya karega:** Ye detect karega ki user `chatgpt.com`, `gemini.google.com` se aaya hai aur data `console.log` ya Google Analytics (GA4) me bhejega.
+
+### 2. Server-Side Tracking (Log Analysis) - Ranking/Crawling ke liye 🔥
+Ye wo "Better Solution" hai jo aapne manga tha.
+AI bots (jaise GPTBot, Google-Extended) JS run nahi karte, wo bas site ko "padhte" (crawl) hain. Agar wo aapki site ko frequent crawl kar rahe hain, iska matlab aapki **Ranking Authority** high hai.
+
+**Maine ek naya tool banaya hai:** `ai_log_analyzer.py`
+
+**Kaise use karein:**
+Ye script aapke server (Apache/Nginx/cPanel) ke logs ko scan karti hai aur batati hai:
+*   OpenAI ke crawler (`GPTBot`) ne kitni baar visit kiya?
+*   Perplexity Bot ne kitni baar site padhi?
+*   Gemini ne kab check kiya?
+
+**Code Logic (`ai_log_analyzer.py`):**
 ```python
-@tool
-def check_ai_ranking(blog_topic: str, site_url: str) -> str:
-    """Checks if AI models recommend your site for the given topic."""
-
-    # 1. Sawal (Prompt) ready karo
-    query = f"What are the best articles about {blog_topic}? Provide links."
-
-    # 2. Perplexity API (Best for searching) se pucho
-    # Note: Aapko PERPLEXITY_API_KEY chahiye hoga
-    import requests
-    url = "https://api.perplexity.ai/chat/completions"
-    payload = {
-        "model": "llama-3.1-sonar-small-128k-online",
-        "messages": [{"role": "user", "content": query}]
+def analyze_server_logs(log_file_path):
+    # Detects specific User-Agents
+    ai_bots = {
+        "GPTBot": "OpenAI Crawler",
+        "ChatGPT-User": "User from ChatGPT",
+        "Google-Extended": "Gemini",
+        "PerplexityBot": "Perplexity AI"
     }
-    headers = {"Authorization": "Bearer YOUR_PERPLEXITY_API_KEY"}
-
-    response = requests.post(url, json=payload, headers=headers)
-    answer = response.json()['choices'][0]['message']['content']
-
-    # 3. Check karo ki humara URL answer me hai ya nahi
-    if site_url in answer:
-        return f"🎉 Great News! Perplexity AI is ranking your site for '{blog_topic}'."
-    else:
-        return f"📉 Not ranking yet on Perplexity. Improve content authority."
+    # Counts hits and generates report
 ```
 
-### 🚀 Future Steps for You
-1.  **Code Fixes maine kar diye hain:** Abhi code `phidata` use kar raha hai aur credentials secure hain.
-2.  **Feature Add karein?** Agar aap chahte hain ki main ye `check_ai_ranking` tool code me implement kar doon, toh mujhe batayein (Iske liye aapko Perplexity ya OpenAI ki API key leni padegi).
+---
 
-Abhi ke liye, maine basic code improve kar diya hai taaki wo smoothly run kare!
+## 🚀 Kaise Setup Karein?
+
+1.  **Code Fixes:** Maine `agno` framework install kar diya hai aur credentials secure kar diye hain.
+2.  **Tracking:**
+    *   **JS:** Automatic hai. Har naye blog post me laga hua milega.
+    *   **Logs:** `ai_log_analyzer.py` ko apne server par run karein jahan logs store hote hain (e.g., `/var/log/apache2/access.log`).
+
+Ab aapke paas **Complete Control** hai: Pata chalega jab AI aapko padh raha hai (Logs) aur jab user wahan se aa raha hai (JS)!

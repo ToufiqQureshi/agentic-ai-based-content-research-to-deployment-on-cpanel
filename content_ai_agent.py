@@ -1,9 +1,9 @@
-from phi.agent import Agent
-from phi.tools.searxng import Searxng
-from phi.model.ollama import Ollama
-from phi.storage.agent.sqlite import SqlAgentStorage
-from phi.tools import tool
-from phi.tools.duckduckgo import DuckDuckGo
+from agno.agent import Agent
+from agno.tools.searxng import SearxngTools
+from agno.models.ollama import Ollama
+from agno.db.sqlite import SqliteDb
+from agno.tools import tool
+from agno.tools.duckduckgo import DuckDuckGoTools
 import requests
 import base64
 import re
@@ -119,21 +119,20 @@ def deploy_to_cpanel(html_content: str, blog_title: str, session_state: dict) ->
 
 
 # Database setup
-# SqliteDb in older versions, SqlAgentStorage in new
-db = SqlAgentStorage(table_name="agent_sessions", db_file="neurofiq_content.db")
+db = SqliteDb(db_file="neurofiq_content.db")
 
 # ============ COMBINED ALL-IN-ONE AGENT ============
 unified_content_agent = Agent(
     name="Unified Content Creation Agent",
     model=Ollama(id="deepseek-v3.1:671b-cloud"),
-    storage=db,
+    db=db,
     session_state={"featured_image_url": None, "permalink": None, "filename": None},
     add_session_state_to_context=True,
     tools=[
         upload_image_to_imgbb,
         deploy_to_cpanel,
-        Searxng(host="http://localhost:8080", fixed_max_results=30),
-        DuckDuckGo(),
+        SearxngTools(host="http://localhost:8080", fixed_max_results=30),
+        DuckDuckGoTools(),
     ],
     instructions="""
     You are an ELITE ALL-IN-ONE CONTENT CREATION SPECIALIST combining:
@@ -312,6 +311,26 @@ unified_content_agent = Agent(
     <link rel="icon" href="https://ik.imagekit.io/s50r6mlmu/9a35ac5f-4794-44da-a55a-ed11fa3e4a88.png?updatedAt=1755519060665" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Neurofiq AI Referral Tracker -->
+    <script>
+    (function() {
+      const aiReferrers = ['chatgpt.com', 'openai.com', 'gemini.google.com', 'bard.google.com', 'claude.ai', 'anthropic.com', 'perplexity.ai', 'copilot.microsoft.com', 'bing.com'];
+      const referrer = document.referrer || "";
+      const matchingAI = aiReferrers.find(domain => referrer.includes(domain));
+      if (matchingAI) {
+        console.log(`🤖 AI Visitor Detected from: ${matchingAI}`);
+        if (typeof gtag === 'function') {
+          gtag('event', 'ai_referral', { 'event_category': 'AI Traffic', 'event_label': matchingAI, 'page_location': window.location.href });
+        }
+        // Send to custom backend (Optional - requires backend setup)
+        // fetch('https://your-api.com/track-ai-referral', {
+        //   method: 'POST',
+        //   headers: {'Content-Type': 'application/json'},
+        //   body: JSON.stringify({ source: matchingAI, url: window.location.href, timestamp: new Date().toISOString() })
+        // }).catch(err => console.error('Tracking failed', err));
+      }
+    })();
+    </script>
     <script>
     tailwind.config = {
         theme: {
